@@ -1,0 +1,21 @@
+import os
+import matplotlib.pyplot as plt
+
+class StockAnalyzer:
+    def plot_stock_data(self, df, stock, market, image_path):
+        # Ensure the directory exists
+        directory = os.path.dirname(image_path)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        # Plotting the stock data
+        plt.figure(figsize=(10, 6))
+        plt.plot(df.index, df['4. close'], label=f"{stock} ({market})")
+        plt.title(f"{stock} Stock Price - {market}")
+        plt.xlabel("Date")
+        plt.ylabel("Closing Price")
+        plt.legend()
+
+        # Save the plot to the specified path
+        plt.savefig(image_path)
+        plt.close()

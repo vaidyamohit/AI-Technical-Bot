@@ -1,0 +1,9 @@
+pandas 
+matplotlib 
+requests 
+pytz 
+google-generativeai 
+streamlit
+google-generativeai 
+alpha_vantage       
+Pillow
