@@ -1,7 +1,46 @@
+from stock_utility_handler import StockAPI, StockAnalyzer
+from ai_insights_handler import AIInsights
+
 import streamlit as st
 import os
 import tempfile
 
+# Initialize session state variables
+if 'page' not in st.session_state:
+    st.session_state.page = "page1"
+    st.session_state.ticker = "RELIANCE"
+    st.session_state.market = "BSE"
+    st.session_state.image_path = ""
+    st.session_state.ai_insights = ""
+    st.session_state.internal_results_available = False
+
+
+# Page 1: Input Page
+def page1():
+    st.title('📈 Stock AI Agent')
+    
+    st.sidebar.header("ℹ️ About")
+    st.sidebar.write("An AI-powered stock analysis platform with insights and visualization.")
+
+    # Improved Layout
+    col1, col2 = st.columns(2)
+    with col1:
+        st.session_state.ticker = st.text_input("🏷️ Enter Stock Ticker Symbol", value=st.session_state.ticker, key="ticker_input")
+    with col2:
+        st.session_state.market = st.selectbox("🌍 Select Market", ["BSE", "NASDAQ"], index=["BSE", "NASDAQ"].index(st.session_state.market), key="market_input")
+
+    st.markdown("---")
+
+    # Center Submit Button
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button('🚀 Submit'):
+            st.session_state.page = "page2"
+            st.session_state.internal_results_available = False
+            st.rerun()
+
+
+# Page 2: Analysis Page
 def page2():
     st.title(f"📈 Analysis for {st.session_state.ticker} ({st.session_state.market})")
 
@@ -67,3 +106,10 @@ def page2():
                 st.session_state.page = "page1"
                 st.session_state.internal_results_available = False
                 st.rerun()
+
+
+# Route between pages
+if st.session_state.page == "page1":
+    page1()
+elif st.session_state.page == "page2":
+    page2()
