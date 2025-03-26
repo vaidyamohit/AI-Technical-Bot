@@ -4,6 +4,8 @@ from ai_insights_handler import AIInsights
 import streamlit as st
 import os
 import tempfile
+from docx import Document
+from docx.shared import Inches
 
 # Initialize session state variables
 if 'page' not in st.session_state:
@@ -38,7 +40,6 @@ def page1():
             st.session_state.page = "page2"
             st.session_state.internal_results_available = False
             st.rerun()
-
 
 
 # Page 2: Analysis Page
