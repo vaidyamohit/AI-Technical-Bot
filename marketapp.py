@@ -83,20 +83,29 @@ def page2():
         with col2:
             st.subheader("💡 AI Insights")
             st.write(st.session_state.ai_insights)
-    # 🆕 Create a downloadable text file
-        analysis_text = f"Stock Analysis for {stock} ({market})\n\n" + st.session_state.ai_insights
-        analysis_path = os.path.join(tempfile.gettempdir(), f"{stock}_{market}_analysis.txt")
+    # 🆕 Create a Word Document
+        doc_path = os.path.join(tempfile.gettempdir(), f"{stock}_{market}_analysis.docx")
+        doc = Document()
+        doc.add_heading(f"Stock Analysis for {stock} ({market})", level=1)
 
-        with open(analysis_path, "w") as file:
-            file.write(analysis_text)
+        # Add AI Insights
+        doc.add_heading("AI Insights:", level=2)
+        doc.add_paragraph(st.session_state.ai_insights)
 
-        # 🆕 Streamlit Download Button
-        with open(analysis_path, "rb") as file:
+        # Add Stock Chart
+        doc.add_heading("Stock Performance Chart:", level=2)
+        doc.add_picture(st.session_state.image_path, width=Inches(5))
+
+        # Save Document
+        doc.save(doc_path)
+
+        # 🆕 Streamlit Download Button for `.docx`
+        with open(doc_path, "rb") as file:
             st.download_button(
-                label="📥 Download Analysis",
+                label="📥 Download Full Analysis (Docx)",
                 data=file,
-                file_name=f"{stock}_{market}_analysis.txt",
-                mime="text/plain"
+                file_name=f"{stock}_{market}_analysis.docx",
+                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             )
 
         st.markdown("---")
