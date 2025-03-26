@@ -73,40 +73,40 @@ def page2():
                 return
 
     # Display Analysis
-    if st.session_state.internal_results_available:
-        st.subheader("📊 Chart Analysis")
-        
-        # Using columns for better layout
-        col1, col2 = st.columns([3, 2])
-        with col1:
-            st.image(st.session_state.image_path, caption=f"{stock} Chart", use_column_width=True)
-        with col2:
-            st.subheader("💡 AI Insights")
-            st.write(st.session_state.ai_insights)
-    # 🆕 Create a Word Document
-        doc_path = os.path.join(tempfile.gettempdir(), f"{stock}_{market}_analysis.docx")
-        doc = Document()
-        doc.add_heading(f"Stock Analysis for {stock} ({market})", level=1)
-
-        # Add AI Insights
-        doc.add_heading("AI Insights:", level=2)
-        doc.add_paragraph(st.session_state.ai_insights)
-
-        # Add Stock Chart
-        doc.add_heading("Stock Performance Chart:", level=2)
-        doc.add_picture(st.session_state.image_path, width=Inches(5))
-
-        # Save Document
-        doc.save(doc_path)
-
-        # 🆕 Streamlit Download Button for `.docx`
-        with open(doc_path, "rb") as file:
-            st.download_button(
-                label="📥 Download Full Analysis (Docx)",
-                data=file,
-                file_name=f"{stock}_{market}_analysis.docx",
-                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            )
+        if st.session_state.internal_results_available:
+            st.subheader("📊 Chart Analysis")
+            
+            # Using columns for better layout
+            col1, col2 = st.columns([3, 2])
+            with col1:
+                st.image(st.session_state.image_path, caption=f"{stock} Chart", use_column_width=True)
+            with col2:
+                st.subheader("💡 AI Insights")
+                st.write(st.session_state.ai_insights)
+        # 🆕 Create a Word Document
+            doc_path = os.path.join(tempfile.gettempdir(), f"{stock}_{market}_analysis.docx")
+            doc = Document()
+            doc.add_heading(f"Stock Analysis for {stock} ({market})", level=1)
+    
+            # Add AI Insights
+            doc.add_heading("AI Insights:", level=2)
+            doc.add_paragraph(st.session_state.ai_insights)
+    
+            # Add Stock Chart
+            doc.add_heading("Stock Performance Chart:", level=2)
+            doc.add_picture(st.session_state.image_path, width=Inches(5))
+    
+            # Save Document
+            doc.save(doc_path)
+    
+            # 🆕 Streamlit Download Button for `.docx`
+            with open(doc_path, "rb") as file:
+                st.download_button(
+                    label="📥 Download Full Analysis (Docx)",
+                    data=file,
+                    file_name=f"{stock}_{market}_analysis.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                )
 
         st.markdown("---")
 
