@@ -1,47 +1,7 @@
-from stock_utility_handler import StockAPI, StockAnalyzer
-from ai_insights_handler import AIInsights
-
 import streamlit as st
 import os
 import tempfile
 
-# Initialize session state variables
-if 'page' not in st.session_state:
-    st.session_state.page = "page1"
-    st.session_state.ticker = "RELIANCE"
-    st.session_state.market = "BSE"
-    st.session_state.image_path = ""
-    st.session_state.ai_insights = ""
-    st.session_state.internal_results_available = False
-
-
-# Page 1: Input Page
-def page1():
-    st.title('📈 Stock AI Agent')
-    
-    st.sidebar.header("ℹ️ About")
-    st.sidebar.write("An AI-powered stock analysis platform with insights and visualization.")
-
-    # Improved Layout
-    col1, col2 = st.columns(2)
-    with col1:
-        st.session_state.ticker = st.text_input("🏷️ Enter Stock Ticker Symbol", value=st.session_state.ticker, key="ticker_input")
-    with col2:
-        st.session_state.market = st.selectbox("🌍 Select Market", ["BSE", "NASDAQ"], index=["BSE", "NASDAQ"].index(st.session_state.market), key="market_input")
-
-    st.markdown("---")
-
-    # Center Submit Button
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button('🚀 Submit'):
-            st.session_state.page = "page2"
-            st.session_state.internal_results_available = False
-            st.rerun()
-
-
-
-# Page 2: Analysis Page
 def page2():
     st.title(f"📈 Analysis for {st.session_state.ticker} ({st.session_state.market})")
 
@@ -76,7 +36,6 @@ def page2():
     if st.session_state.internal_results_available:
         st.subheader("📊 Chart Analysis")
         
-        # Using columns for better layout
         col1, col2 = st.columns([3, 2])
         with col1:
             st.image(st.session_state.image_path, caption=f"{stock} Chart", use_column_width=True)
@@ -84,20 +43,27 @@ def page2():
             st.subheader("💡 AI Insights")
             st.write(st.session_state.ai_insights)
 
+        # Create a downloadable text file
+        analysis_text = f"Stock Analysis for {stock} ({market})\n\n" + st.session_state.ai_insights
+        analysis_path = os.path.join(tempfile.gettempdir(), f"{stock}_{market}_analysis.txt")
+        with open(analysis_path, "w") as file:
+            file.write(analysis_text)
+
+        # Streamlit Download Button
+        with open(analysis_path, "rb") as file:
+            st.download_button(
+                label="📥 Download Analysis",
+                data=file,
+                file_name=f"{stock}_{market}_analysis.txt",
+                mime="text/plain"
+            )
+
         st.markdown("---")
 
-        # 🆕 Always show Back button at the bottom
+        # Back button
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             if st.button("🔙 Back to Home"):
                 st.session_state.page = "page1"
                 st.session_state.internal_results_available = False
                 st.rerun()
-
-
-
-# Route between pages
-if st.session_state.page == "page1":
-    page1()
-elif st.session_state.page == "page2":
-    page2()
