@@ -83,6 +83,21 @@ def page2():
         with col2:
             st.subheader("💡 AI Insights")
             st.write(st.session_state.ai_insights)
+    # 🆕 Create a downloadable text file
+        analysis_text = f"Stock Analysis for {stock} ({market})\n\n" + st.session_state.ai_insights
+        analysis_path = os.path.join(tempfile.gettempdir(), f"{stock}_{market}_analysis.txt")
+
+        with open(analysis_path, "w") as file:
+            file.write(analysis_text)
+
+        # 🆕 Streamlit Download Button
+        with open(analysis_path, "rb") as file:
+            st.download_button(
+                label="📥 Download Analysis",
+                data=file,
+                file_name=f"{stock}_{market}_analysis.txt",
+                mime="text/plain"
+            )
 
         st.markdown("---")
 
