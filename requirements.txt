@@ -7,3 +7,4 @@ streamlit
 google-generativeai 
 alpha_vantage       
 Pillow
+python-docx
