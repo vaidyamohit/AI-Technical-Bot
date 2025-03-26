@@ -22,16 +22,16 @@ def page1():
     st.sidebar.header("ℹ️ About")
     st.sidebar.write("An AI-powered stock analysis platform with insights and visualization.")
 
-    # Improved Layout
+    # Input fields
     col1, col2 = st.columns(2)
     with col1:
-        st.session_state.ticker = st.text_input("🏷️ Enter Stock Ticker Symbol", value=st.session_state.ticker, key="ticker_input")
+        st.session_state.ticker = st.text_input("🏷️ Enter Stock Ticker Symbol", value=st.session_state.ticker)
     with col2:
-        st.session_state.market = st.selectbox("🌍 Select Market", ["BSE", "NASDAQ"], index=["BSE", "NASDAQ"].index(st.session_state.market), key="market_input")
+        st.session_state.market = st.selectbox("🌍 Select Market", ["BSE", "NASDAQ"], index=["BSE", "NASDAQ"].index(st.session_state.market))
 
     st.markdown("---")
 
-    # Center Submit Button
+    # Submit button
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         if st.button('🚀 Submit'):
