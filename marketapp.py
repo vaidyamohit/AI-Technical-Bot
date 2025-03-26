@@ -21,8 +21,40 @@ if 'page' not in st.session_state:
 def page1():
     st.title('📈 Stock AI Agent')
     
-    st.sidebar.header("ℹ️ About")
-    st.sidebar.write("An AI-powered stock analysis platform with insights and visualization.")
+    st.sidebar.header("ℹ️ About This AI-Powered Stock Analysis Bot")
+
+st.sidebar.write("""
+### 📌 Overview  
+This AI-powered stock analysis bot is designed to help **investors, traders, and finance enthusiasts** make **data-driven** decisions. It provides **detailed stock analysis, AI-generated insights, and visualized stock trends.**
+
+### 🎯 Who Can Benefit?  
+- **Retail Investors** 📈 - Understand stock trends before investing.  
+- **Day Traders** 💹 - Get insights on short-term movements.  
+- **Financial Analysts** 📊 - Leverage AI for deeper stock analysis.  
+- **Students & Researchers** 🎓 - Learn about market trends and stock behavior.  
+
+### 🔍 What This Bot Offers?  
+✅ **Stock Price Trends:** Analyze stock price movements over time.  
+✅ **AI-Powered Insights:** Uses AI to suggest if a stock is worth investing in.  
+✅ **Moving Averages (7-Day & 20-Day):** Identify bullish and bearish trends.  
+✅ **Trading Volume Analysis:** Understand buying and selling pressure.  
+✅ **Market Comparisons:** Supports multiple stock markets like **BSE & NASDAQ**.  
+✅ **Downloadable Reports:** Get a `.docx` file with the full analysis and chart.  
+
+### ⚡ How It Works?  
+1️⃣ **Enter the stock ticker symbol (e.g., RELIANCE, AAPL, MSFT).**  
+2️⃣ **Select the market (BSE or NASDAQ).**  
+3️⃣ **Click ‘Submit’ to generate insights.**  
+4️⃣ **View stock chart & AI insights.**  
+5️⃣ **Download the full analysis as a `.docx` file.**  
+
+🚀 **Powered by AI & Machine Learning for Smarter Investing!**
+
+---
+
+© **Copyright 2024 - Mohit Vaidya & Nakul Arora, FORE School of Management**
+""")
+
 
     # Improved Layout
     col1, col2 = st.columns(2)
