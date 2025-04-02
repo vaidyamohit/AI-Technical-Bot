@@ -52,7 +52,7 @@ def page1():
     🚀 **Powered by AI & Machine Learning for Smarter Investing!**
 
     ---
-    © **Copyright 2024 - Mohit Vaidya & Nakul Arora, FORE School of Management**
+    © **Copyright 2025 - Mohit Vaidya & Nakul Arora, FORE School of Management**
     """)
 
     # Input Section
@@ -93,7 +93,9 @@ def page2():
 
                 market_data = stock_api_obj.get_stock_info(stock, market)
                 df = stock_analyzer_obj.json_to_dataframe(market_data, stock, market)
-                stock_analyzer_obj.plot_stock_data(df, stock, market, image_path)
+                fib_levels = stock_analyzer.calculate_fibonacci_levels(df)  # Compute Fibonacci levels
+                stock_analyzer.plot_stock_data(df, stock_symbol, market, image_path, fib_levels)  # Pass it
+
 
                 response = ai_insights_obj.get_ai_insights(image_path, stock, market)
                 st.session_state.ai_insights = "\n".join([part.text for candidate in response.candidates for part in candidate.content.parts])
