@@ -3,28 +3,19 @@ import matplotlib.pyplot as plt
 
 class StockAnalyzer:
     def plot_stock_data(self, df, stock, market, image_path):
+        # Ensure the directory exists
         directory = os.path.dirname(image_path)
         if not os.path.exists(directory):
             os.makedirs(directory)
 
-        plt.figure(figsize=(12, 6))
-        plt.plot(df.index, df["4. close"], label="Closing Price", color="blue")
-        plt.plot(df.index, df["100_day_MA"], label="100-day MA", linestyle="dashed", color="green")
-        plt.plot(df.index, df["200_day_MA"], label="200-day MA", linestyle="dashed", color="red")
-
-        # Plot Fibonacci Levels
-        plt.axhline(df["fib_0"].iloc[-1], linestyle="dotted", color="gray", label="Fib 0%")
-        plt.axhline(df["fib_23.6"].iloc[-1], linestyle="dotted", color="gray", label="Fib 23.6%")
-        plt.axhline(df["fib_38.2"].iloc[-1], linestyle="dotted", color="gray", label="Fib 38.2%")
-        plt.axhline(df["fib_50"].iloc[-1], linestyle="dotted", color="gray", label="Fib 50%")
-        plt.axhline(df["fib_61.8"].iloc[-1], linestyle="dotted", color="gray", label="Fib 61.8%")
-        plt.axhline(df["fib_100"].iloc[-1], linestyle="dotted", color="gray", label="Fib 100%")
-
-        plt.title(f"{stock} Stock Price Analysis - {market}")
+        # Plotting the stock data
+        plt.figure(figsize=(10, 6))
+        plt.plot(df.index, df['4. close'], label=f"{stock} ({market})")
+        plt.title(f"{stock} Stock Price - {market}")
         plt.xlabel("Date")
-        plt.ylabel("Price")
+        plt.ylabel("Closing Price")
         plt.legend()
-        plt.grid()
 
+        # Save the plot to the specified path
         plt.savefig(image_path)
         plt.close()
