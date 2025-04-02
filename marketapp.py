@@ -37,10 +37,10 @@ def page1():
     ✅ **Stock Price Trends:** Analyze stock price movements over time.  
     ✅ **AI-Powered Insights:** Uses AI to suggest if a stock is worth investing in.  
     ✅ Moving Averages Analysis – Identify bullish and bearish trends using 7-day, 20-day, 100-day, and 200-day moving averages.  
-    ✅ Trading Volume Analysis – Understand buying and selling pressure through volume trends.
-    ✅ Fibonacci & Technical Indicators – Utilize Fibonacci retracement levels to assess potential price reversals.
-    ✅ **Market Comparisons:** Supports multiple stock markets like **BSE & NASDAQ**.
-    ✅ **Downloadable Reports:** Get a `.docx` file with full analysis and chart.
+    ✅ Trading Volume Analysis – Understand buying and selling pressure through volume trends.  
+    ✅ Fibonacci & Technical Indicators – Utilize Fibonacci retracement levels to assess potential price reversals.  
+    ✅ **Market Comparisons:** Supports multiple stock markets like **BSE & NASDAQ**.  
+    ✅ **Downloadable Reports:** Get a `.docx` file with full analysis and chart.  
 
     ### ⚡ How It Works?  
     1️⃣ **Enter the stock ticker symbol (e.g., RELIANCE, AAPL, MSFT).**  
