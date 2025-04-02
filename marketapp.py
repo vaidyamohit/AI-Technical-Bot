@@ -16,49 +16,29 @@ if 'page' not in st.session_state:
     st.session_state.ai_insights = ""
     st.session_state.internal_results_available = False
 
-
 # Page 1: Input Page
 def page1():
     st.title('📈 Stock AI Agent')
 
-    # Sidebar: Detailed About Section
+    # Sidebar: About Section
     st.sidebar.header("ℹ️ About This AI-Powered Stock Analysis Bot")
     st.sidebar.write("""
-    ### 📌 Overview  
-    This AI-powered stock analysis bot helps **investors, traders, and finance enthusiasts** make **data-driven** decisions.  
-    It provides **detailed stock analysis, AI-generated insights, and visualized stock trends**.
+    **🚀 Features:**  
+    ✅ Stock price trends  
+    ✅ AI-powered insights  
+    ✅ Moving averages & Fibonacci levels  
+    ✅ Downloadable reports  
 
-    ### 🎯 Who Can Benefit?  
-    - **Retail Investors** 📈 - Understand stock trends before investing.  
-    - **Day Traders** 💹 - Get insights on short-term movements.  
-    - **Financial Analysts** 📊 - Leverage AI for deeper stock analysis.  
-    - **Students & Researchers** 🎓 - Learn about market trends and stock behavior.  
-
-    ### 🔍 What This Bot Offers?  
-    ✅ **Stock Price Trends:** Analyze stock price movements over time.  
-    ✅ **AI-Powered Insights:** Uses AI to suggest if a stock is worth investing in.  
-    ✅ **Moving Averages (7-Day & 20-Day):** Identify bullish and bearish trends.  
-    ✅ **Trading Volume Analysis:** Understand buying and selling pressure.  
-    ✅ **Market Comparisons:** Supports multiple stock markets like **BSE & NASDAQ**.  
-    ✅ **Downloadable Reports:** Get a `.docx` file with full analysis and chart.  
-
-    ### ⚡ How It Works?  
-    1️⃣ **Enter the stock ticker symbol (e.g., RELIANCE, AAPL, MSFT).**  
-    2️⃣ **Select the market (BSE or NASDAQ).**  
-    3️⃣ **Click ‘Submit’ to generate insights.**  
-    4️⃣ **View stock chart & AI insights.**  
-    5️⃣ **Download the full analysis as a `.docx` file.**  
-
-    🚀 **Powered by AI & Machine Learning for Smarter Investing!**
-
-    ---
-    © **Copyright 2025 - Mohit Vaidya & Nakul Arora, FORE School of Management**
+    **📌 How It Works?**  
+    1️⃣ Enter stock ticker & market  
+    2️⃣ Click ‘Submit’  
+    3️⃣ Get analysis & download report  
     """)
 
-    # Input Section
+    # User Input
     col1, col2 = st.columns(2)
     with col1:
-        st.session_state.ticker = st.text_input("🏷️ Enter Stock Ticker Symbol", value=st.session_state.ticker, key="ticker_input")
+        st.session_state.ticker = st.text_input("🏷️ Enter Stock Ticker", value=st.session_state.ticker, key="ticker_input")
     with col2:
         st.session_state.market = st.selectbox("🌍 Select Market", ["BSE", "NASDAQ"], index=["BSE", "NASDAQ"].index(st.session_state.market), key="market_input")
 
@@ -72,10 +52,9 @@ def page1():
             st.session_state.internal_results_available = False
             st.rerun()
 
-
 # Page 2: Analysis Page
 def page2():
-    st.title(f"📈 Analysis for {st.session_state.ticker} ({st.session_state.market})")
+    st.title(f"📊 Analysis for {st.session_state.ticker} ({st.session_state.market})")
 
     stock = st.session_state.ticker
     market = st.session_state.market
@@ -93,8 +72,8 @@ def page2():
 
                 market_data = stock_api_obj.get_stock_info(stock, market)
                 df = stock_analyzer_obj.json_to_dataframe(market_data, stock, market)
-                fib_levels = stock_analyzer_obj.calculate_fibonacci_levels(df)  # ✅ FIXED: Using correct instance
-                stock_analyzer_obj.plot_stock_data(df, stock, market, image_path, fib_levels)  # ✅ FIXED: Using correct instance and variable names
+                fib_levels = stock_analyzer_obj.calculate_fibonacci_levels(df)
+                stock_analyzer_obj.plot_stock_data(df, stock, market, image_path, fib_levels)
 
                 response = ai_insights_obj.get_ai_insights(image_path, stock, market)
                 st.session_state.ai_insights = "\n".join([part.text for candidate in response.candidates for part in candidate.content.parts])
@@ -107,18 +86,15 @@ def page2():
 
     # Display Analysis
     if st.session_state.internal_results_available:
-        st.subheader("📊 Chart Analysis")
-        
-        # Using columns for better layout
-        col1, col2 = st.columns([3, 2])
-        with col1:
-            st.image(st.session_state.image_path, caption=f"{stock} Chart", use_column_width=True)
-        with col2:
-            st.subheader("💡 AI Insights")
-            st.write(st.session_state.ai_insights)
+        st.subheader("📊 Stock Performance Chart")
+        st.image(st.session_state.image_path, caption=f"{stock} Chart", use_container_width=True)  # ✅ Chart is now bigger
 
-            st.subheader("📌 Buy & Exit Ranges")
-            st.write("This section provides recommendations on when to buy or exit based on AI analysis.")
+        # AI Insights below the image
+        st.subheader("💡 AI Insights")
+        st.write(st.session_state.ai_insights)
+
+        st.subheader("📌 Buy & Exit Ranges")
+        st.write("This section provides recommendations on when to buy or exit based on AI analysis.")
 
         # 🆕 Create a Word Document
         doc_path = os.path.join(tempfile.gettempdir(), f"{stock}_{market}_analysis.docx")
@@ -136,7 +112,7 @@ def page2():
         # Save Document
         doc.save(doc_path)
 
-        # 🆕 Streamlit Download Button for `.docx`
+        # 🆕 Download Button for `.docx`
         with open(doc_path, "rb") as file:
             st.download_button(
                 label="📥 Download Full Analysis (Docx)",
@@ -154,7 +130,6 @@ def page2():
                 st.session_state.page = "page1"
                 st.session_state.internal_results_available = False
                 st.rerun()
-
 
 # Route between pages
 if st.session_state.page == "page1":
