@@ -93,9 +93,6 @@ def page2():
         st.subheader("💡 AI Insights")
         st.write(st.session_state.ai_insights)
 
-        st.subheader("📌 Buy & Exit Ranges")
-        st.write("This section provides recommendations on when to buy or exit based on AI analysis.")
-
         # 🆕 Create a Word Document
         doc_path = os.path.join(tempfile.gettempdir(), f"{stock}_{market}_analysis.docx")
         doc = Document()
