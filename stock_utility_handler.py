@@ -1,32 +1,65 @@
 import pandas as pd
-import json
+import requests
+import yfinance as yf
 from datetime import datetime
 import pytz
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.widgets as widgets
-import requests
+import os
 
 class StockAPI:
     def __init__(self, api_key):
         self.api_key = api_key
 
     def get_stock_info(self, stock, market):
-        if market == 'NASDAQ':
-            url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={stock}&outputsize=compact&apikey={self.api_key}'
-        else:
-            url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={stock}.{market}&outputsize=compact&apikey={self.api_key}'
-        r = requests.get(url)
-        data = r.json()
+        symbol = f"{stock}.{market}" if market != 'NASDAQ' else stock
+        url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&outputsize=compact&apikey={self.api_key}'
+        response = requests.get(url)
+        data = response.json()
         return data
+
+    def get_financial_ratios(self, stock):
+        try:
+            ticker = yf.Ticker(stock)
+            financials = ticker.financials
+            balance_sheet = ticker.balance_sheet
+            cashflow = ticker.cashflow
+
+            def get_value(df, key):
+                return df.loc[key].iloc[0] if key in df.index else None
+
+            revenue = get_value(financials, "Total Revenue")
+            net_income = get_value(financials, "Net Income")
+            total_assets = get_value(balance_sheet, "Total Assets")
+            total_liabilities = get_value(balance_sheet, "Total Liabilities Net Minority Interest")
+            stockholders_equity = get_value(balance_sheet, "Stockholders Equity")
+            invested_capital = get_value(balance_sheet, "Invested Capital")
+            ebit = get_value(financials, "EBIT")
+            operating_cashflow = get_value(cashflow, "Operating Cash Flow")
+            total_debt = get_value(balance_sheet, "Total Debt")
+            current_assets = get_value(balance_sheet, "Current Assets")
+            current_liabilities = get_value(balance_sheet, "Current Liabilities")
+
+            ratios = {
+                "ROIC (%)": (net_income / invested_capital) * 100 if net_income and invested_capital else None,
+                "ROA (%)": (net_income / total_assets) * 100 if net_income and total_assets else None,
+                "Debt-to-Equity": total_liabilities / stockholders_equity if total_liabilities and stockholders_equity else None,
+                "Current Ratio": current_assets / current_liabilities if current_assets and current_liabilities else None,
+                "EBIT Margin (%)": (ebit / revenue) * 100 if ebit and revenue else None,
+                "Operating Cash Flow to Debt": operating_cashflow / total_debt if operating_cashflow and total_debt else None
+            }
+
+            return ratios
+        except Exception as e:
+            return {"Error": str(e)}
 
 class StockAnalyzer:
     def __init__(self):
         pass
 
     def json_to_dataframe(self, json_data, stock_symbol, market):
-        print(json_data)
-        time_series_data = json_data['Time Series (Daily)']
+        time_series_data = json_data.get('Time Series (Daily)', {})
         df_data = []
 
         for date_str, values in time_series_data.items():
