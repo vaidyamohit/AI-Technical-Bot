@@ -1,5 +1,6 @@
 from stock_utility_handler import StockAPI, StockAnalyzer
 from ai_insights_handler import AIInsights
+from fundamental_handler import get_fundamental_data
 
 import streamlit as st
 import os
@@ -12,65 +13,44 @@ if 'page' not in st.session_state:
     st.session_state.page = "page1"
     st.session_state.ticker = "RELIANCE"
     st.session_state.market = "BSE"
+    st.session_state.analysis_type = "Technical"
     st.session_state.image_path = ""
     st.session_state.ai_insights = ""
+    st.session_state.fundamentals = ""
     st.session_state.internal_results_available = False
 
 # Page 1: Input Page
 def page1():
     st.title('📈 Stock AI Agent')
 
-    # Sidebar: About Section
     st.sidebar.header("ℹ️ About This AI-Powered Stock Analysis Bot")
     st.sidebar.write("""
     ### 📌 Overview  
-    This AI-powered stock analysis bot helps **investors, traders, and finance enthusiasts** make **data-driven** decisions.  
-    It provides **detailed stock analysis, AI-generated insights, and visualized stock trends**.
+    This AI-powered bot helps **investors, traders**, and **analysts** with insights from both technical charts and fundamental data.
 
-    ### 🎯 Who Can Benefit?  
-    - **Retail Investors** 📈 - Understand stock trends before investing.  
-    - **Day Traders** 💹 - Get insights on short-term movements.  
-    - **Financial Analysts** 📊 - Leverage AI for deeper stock analysis.  
-    - **Students & Researchers** 🎓 - Learn about market trends and stock behavior.  
+    ### 🔍 What You Get  
+    - ✅ Technical Charts + AI Insights  
+    - ✅ Company Financials (Fundamentals)  
+    - ✅ Market Support: BSE & NASDAQ  
+    - ✅ Downloadable Reports (DOCX)
 
-    ### 🔍 What This Bot Offers?  
-    ✅ **Stock Price Trends:** Analyze stock price movements over time.  
-    ✅ **AI-Powered Insights:** Uses AI to suggest if a stock is worth investing in.  
-    ✅ Moving Averages Analysis – Identify bullish and bearish trends using 7-day, 20-day, 100-day, and 200-day moving averages.  
-    ✅ Trading Volume Analysis – Understand buying and selling pressure through volume trends.  
-    ✅ Fibonacci & Technical Indicators – Utilize Fibonacci retracement levels to assess potential price reversals.  
-    ✅ **Market Comparisons:** Supports multiple stock markets like **BSE & NASDAQ**.  
-    ✅ **Downloadable Reports:** Get a `.docx` file with full analysis and chart.  
-
-    ### ⚡ How It Works?  
-    1️⃣ **Enter the stock ticker symbol (e.g., RELIANCE, AAPL, MSFT).**  
-    2️⃣ **Select the market (BSE or NASDAQ).**  
-    3️⃣ **Click ‘Submit’ to generate insights.**  
-    4️⃣ **View stock chart & AI insights.**  
-    5️⃣ **Download the full analysis as a `.docx` file.**  
-
-    🚀 **Powered by AI & Machine Learning for Smarter Investing!**
-
-    ---
-    © **Copyright 2025 - Mohit Vaidya & Nakul Arora, FORE School of Management**
+    🚀 Built with AI & Machine Learning
     """)
 
-    # User Input
     col1, col2 = st.columns(2)
     with col1:
         st.session_state.ticker = st.text_input("🏷️ Enter Stock Ticker", value=st.session_state.ticker, key="ticker_input")
     with col2:
         st.session_state.market = st.selectbox("🌍 Select Market", ["BSE", "NASDAQ"], index=["BSE", "NASDAQ"].index(st.session_state.market), key="market_input")
 
+    st.session_state.analysis_type = st.selectbox("📊 Select Analysis Type", ["Technical", "Fundamental", "Both"])
+
     st.markdown("---")
 
-    # Submit Button
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button('🚀 Submit'):
-            st.session_state.page = "page2"
-            st.session_state.internal_results_available = False
-            st.rerun()
+    if st.button('🚀 Submit'):
+        st.session_state.page = "page2"
+        st.session_state.internal_results_available = False
+        st.rerun()
 
 # Page 2: Analysis Page
 def page2():
@@ -78,6 +58,7 @@ def page2():
 
     stock = st.session_state.ticker
     market = st.session_state.market
+    analysis_type = st.session_state.analysis_type
 
     if not st.session_state.internal_results_available:
         with st.spinner('🔍 Analyzing... Please wait...'):
@@ -90,65 +71,67 @@ def page2():
                 stock_analyzer_obj = StockAnalyzer()
                 ai_insights_obj = AIInsights("AIzaSyAVi1v80vt41mTjZED6BaMs5-74HKFkSk0")
 
-                market_data = stock_api_obj.get_stock_info(stock, market)
-                df = stock_analyzer_obj.json_to_dataframe(market_data, stock, market)
-                fib_levels = stock_analyzer_obj.calculate_fibonacci_levels(df)
-                stock_analyzer_obj.plot_stock_data(df, stock, market, image_path, fib_levels)
+                doc = Document()
+                doc.add_heading(f"Stock Analysis for {stock} ({market})", level=1)
 
-                response = ai_insights_obj.get_ai_insights(image_path, stock, market)
-                st.session_state.ai_insights = "\n".join([part.text for candidate in response.candidates for part in candidate.content.parts])
+                if analysis_type in ["Technical", "Both"]:
+                    market_data = stock_api_obj.get_stock_info(stock, market)
+                    df = stock_analyzer_obj.json_to_dataframe(market_data, stock, market)
+                    fib_levels = stock_analyzer_obj.calculate_fibonacci_levels(df)
+                    stock_analyzer_obj.plot_stock_data(df, stock, market, image_path, fib_levels)
 
+                    ai_response = ai_insights_obj.get_ai_insights(image_path, stock, market)
+                    ai_text = "\n".join([part.text for candidate in ai_response.candidates for part in candidate.content.parts])
+                    st.session_state.ai_insights = ai_text
+
+                    doc.add_heading("💡 Technical Insights", level=2)
+                    doc.add_paragraph(ai_text)
+                    doc.add_picture(image_path, width=Inches(5))
+
+                if analysis_type in ["Fundamental", "Both"]:
+                    fundamentals = get_fundamental_data(stock, market)
+                    st.session_state.fundamentals = fundamentals
+                    doc.add_heading("📚 Fundamental Analysis", level=2)
+                    for key, value in fundamentals.items():
+                        doc.add_paragraph(f"{key}: {value}")
+
+                doc_path = os.path.join(tempfile.gettempdir(), f"{stock}_{market}_{analysis_type}_analysis.docx")
+                doc.save(doc_path)
+                st.session_state.doc_path = doc_path
                 st.session_state.internal_results_available = True
 
             except Exception as e:
                 st.error(f"❌ An error occurred: {e}")
                 return
 
-    # Display Analysis
+    # Display Results
     if st.session_state.internal_results_available:
-        st.subheader("📊 Stock Performance Chart")
-        st.image(st.session_state.image_path, caption=f"{stock} Chart", use_container_width=True)  # ✅ Chart is now bigger
+        if analysis_type in ["Technical", "Both"]:
+            st.subheader("📈 Stock Chart")
+            st.image(st.session_state.image_path, caption=f"{stock} Chart", use_container_width=True)
+            st.subheader("💡 AI Insights")
+            st.write(st.session_state.ai_insights)
 
-        # AI Insights below the image
-        st.subheader("💡 AI Insights")
-        st.write(st.session_state.ai_insights)
+        if analysis_type in ["Fundamental", "Both"]:
+            st.subheader("📚 Fundamentals")
+            for k, v in st.session_state.fundamentals.items():
+                st.write(f"**{k}:** {v}")
 
-        # 🆕 Create a Word Document
-        doc_path = os.path.join(tempfile.gettempdir(), f"{stock}_{market}_analysis.docx")
-        doc = Document()
-        doc.add_heading(f"Stock Analysis for {stock} ({market})", level=1)
-
-        # Add AI Insights
-        doc.add_heading("AI Insights:", level=2)
-        doc.add_paragraph(st.session_state.ai_insights)
-
-        # Add Stock Chart
-        doc.add_heading("Stock Performance Chart:", level=2)
-        doc.add_picture(st.session_state.image_path, width=Inches(5))
-
-        # Save Document
-        doc.save(doc_path)
-
-        # 🆕 Download Button for `.docx`
-        with open(doc_path, "rb") as file:
+        with open(st.session_state.doc_path, "rb") as file:
             st.download_button(
-                label="📥 Download Full Analysis (Docx)",
+                label=f"📥 Download {analysis_type} Report (Docx)",
                 data=file,
-                file_name=f"{stock}_{market}_analysis.docx",
+                file_name=os.path.basename(st.session_state.doc_path),
                 mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             )
 
         st.markdown("---")
+        if st.button("🔙 Back to Home"):
+            st.session_state.page = "page1"
+            st.session_state.internal_results_available = False
+            st.rerun()
 
-        # Back button
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            if st.button("🔙 Back to Home"):
-                st.session_state.page = "page1"
-                st.session_state.internal_results_available = False
-                st.rerun()
-
-# Route between pages
+# Page Routing
 if st.session_state.page == "page1":
     page1()
 elif st.session_state.page == "page2":
